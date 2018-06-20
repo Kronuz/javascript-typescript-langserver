@@ -150,6 +150,16 @@ export class PluginLoader {
      * @param initialDir
      */
     private resolveModule(moduleName: string, initialDir: string): {} | undefined {
+        const modulePath = path.resolve(__dirname, moduleName);
+        if (this.fs.fileExists(modulePath)) {
+            this.logger.info(`Loading ${moduleName} from ${modulePath} (peer module)`)
+            try {
+                return this.requireModule(modulePath);
+            } catch (error) {
+                this.logger.error(`Failed to load module: ${JSON.stringify(error)}`)
+                return undefined
+            }
+        }
         const resolvedPath = toUnixPath(path.resolve(combinePaths(initialDir, 'node_modules')))
         this.logger.info(`Loading ${moduleName} from ${initialDir} (resolved to ${resolvedPath})`)
         const result = this.requirePlugin(resolvedPath, moduleName)
