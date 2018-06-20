@@ -15,20 +15,16 @@ import { TypeScriptService, TypeScriptServiceOptions } from './typescript-servic
 
 const packageJson = require('../package.json')
 const program = require('commander')
-const { initTracer } = require('jaeger-client')
 
 program
     .version(packageJson.version)
     .option('-s, --strict', 'enables strict mode')
     .option('-t, --trace', 'print all requests and responses')
     .option('-l, --logfile [file]', 'log to this file')
-    .option('-j, --enable-jaeger', 'enable OpenTracing through Jaeger')
     .parse(process.argv)
 
 const logger = program.logfile ? new FileLogger(program.logfile) : new StderrLogger()
-const tracer = program.enableJaeger
-    ? initTracer({ serviceName: 'javascript-typescript-langserver', sampler: { type: 'const', param: 1 } })
-    : new Tracer()
+const tracer = new Tracer()
 
 const options: TypeScriptServiceOptions & MessageLogOptions & RegisterLanguageHandlerOptions = {
     strict: program.strict,
